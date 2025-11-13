@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonebook Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contact-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+
+        .contact-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .contact-info {
+            margin-bottom: 10px;
+        }
+
+        .contact-info strong {
+            color: #666;
+            display: inline-block;
+            width: 70px;
+        }
+
+        .contact-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            animation: slideIn 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contacts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📞 Phonebook Management</h1>
+            <p>Manage your contacts efficiently</p>
+        </div>
+
+        <div class="content">
+            <!-- Add/Edit Contact Form -->
+            <div class="form-section">
+                <h2 id="formTitle">Add New Contact</h2>
+                <form id="contactForm">
+                    <input type="hidden" id="contactId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Name *</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone *</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="address">Address</label>
+                        <textarea id="address"></textarea>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary">
+                            <span id="submitBtnText">Add Contact</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Search and Contacts List -->
+            <div>
+                <h2 style="color: #667eea; margin-bottom: 20px;">Contact List</h2>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search contacts by name...">
+                </div>
+                <div id="contactsList" class="contacts-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In-memory storage for contacts (simulating file handling)
+        let contacts = [];
+        let nextId = 1;
+        let editingId = null;
+
+        // Initialize with sample data
+        function initializeData() {
+            const savedContacts = localStorage.getItem('phonebookContacts');
+            if (savedContacts) {
+                contacts = JSON.parse(savedContacts);
+                nextId = contacts.length > 0 ? Math.max(...contacts.map(c => c.id)) + 1 : 1;
+            }
+        }
+
+        // Save to localStorage (simulating file persistence)
+        function saveData() {
+            localStorage.setItem('phonebookContacts', JSON.stringify(contacts));
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Add/Update Contact
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const contact = {
+                id: editingId || nextId++,
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value
+            };
+
+            if (editingId) {
+                const index = contacts.findIndex(c => c.id === editingId);
+                contacts[index] = contact;
+                showNotification('Contact updated successfully!');
+                editingId = null;
+            } else {
+                contacts.push(contact);
+                showNotification('Contact added successfully!');
+            }
+
+            saveData();
+            resetForm();
+            displayContacts();
+        });
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('contactForm').reset();
+            document.getElementById('formTitle').textContent = 'Add New Contact';
+            document.getElementById('submitBtnText').textContent = 'Add Contact';
+            document.getElementById('cancelBtn').style.display = 'none';
+            editingId = null;
+        }
+
+        // Cancel editing
+        document.getElementById('cancelBtn').addEventListener('click', resetForm);
+
+        // Edit contact
+        function editContact(id) {
+            const contact = contacts.find(c => c.id === id);
+            if (contact) {
+                editingId = id;
+                document.getElementById('name').value = contact.name;
+                document.getElementById('phone').value = contact.phone;
+                document.getElementById('email').value = contact.email;
+                document.getElementById('address').value = contact.address;
+                document.getElementById('formTitle').textContent = 'Edit Contact';
+                document.getElementById('submitBtnText').textContent = 'Update Contact';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Delete contact
+        function deleteContact(id) {
+            if (confirm('Are you sure you want to delete this contact?')) {
+                contacts = contacts.filter(c => c.id !== id);
+                saveData();
+                showNotification('Contact deleted successfully!');
+                displayContacts();
+            }
+        }
+
+        // Display contacts
+        function displayContacts(filteredContacts = null) {
+            const contactsList = document.getElementById('contactsList');
+            const displayList = filteredContacts || contacts;
+
+            if (displayList.length === 0) {
+                contactsList.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                        <h3>No contacts found</h3>
+                        <p>Add your first contact to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            contactsList.innerHTML = displayList.map(contact => `
+                <div class="contact-card">
+                    <h3>${contact.name}</h3>
+                    <div class="contact-info">
+                        <strong>Phone:</strong> ${contact.phone}
+                    </div>
+                    ${contact.email ? `
+                    <div class="contact-info">
+                        <strong>Email:</strong> ${contact.email}
+                    </div>
+                    ` : ''}
+                    ${contact.address ? `
+                    <div class="contact-info">
+                        <strong>Address:</strong> ${contact.address}
+                    </div>
+                    ` : ''}
+                    <div class="contact-actions">
+                        <button class="btn btn-edit" onclick="editContact(${contact.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteContact(${contact.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm === '') {
+                displayContacts();
+            } else {
+                const filtered = contacts.filter(contact =>
+                    contact.name.toLowerCase().includes(searchTerm) ||
+                    contact.phone.includes(searchTerm) ||
+                    (contact.email && contact.email.toLowerCase().includes(searchTerm))
+                );
+                displayContacts(filtered);
+            }
+        });
+
+        // Initialize
+        initializeData();
+        displayContacts();
+    </script>
+</body>
+</html>
